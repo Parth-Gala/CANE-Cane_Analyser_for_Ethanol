@@ -3,6 +3,7 @@ import { GoogleMap, LoadScript, Marker, Polygon } from "@react-google-maps/api";
 import axios from "axios";
 import { useCoordinate } from "../utils/CoordinateContext";
 import { Link } from "react-router-dom";
+
 const MapComponent = () => {
   const [markerPositions, setMarkerPositions] = useState([]);
   const [isMarkerActive, setIsMarkerActive] = useState(true);
@@ -116,7 +117,7 @@ const MapComponent = () => {
 
   return (
     <div>
-    <LoadScript googleMapsApiKey="AIzaSyC5QkMgaiQo3G7RH95BWJoqzWbKczWVCkU" async>
+    <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API} async>
       <div className="">
         <h1 className=" justify-center flex items-center text-center font-bold text-xl">Choose from Predefined Locations</h1>
 
