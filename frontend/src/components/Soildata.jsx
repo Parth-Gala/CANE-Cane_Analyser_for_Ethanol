@@ -62,9 +62,9 @@ const Soildata = ({ lon, lat }) => {
   }, [apiUrl, lon, lat]);
 
   const prepareChartData = () => {
-    if (!soilData){
+    if (!soilData) {
       return <p>Wrong place selected. Please choose another loacation.</p>;
-    } 
+    }
 
     const datasets = soilData.properties.layers
       .filter((layer) => ["sand", "clay", "silt"].includes(layer.name))
@@ -85,42 +85,6 @@ const Soildata = ({ lon, lat }) => {
       datasets: datasets,
     };
   };
-
-  // const getPhh2oValue = () => {
-  //   if (!soilData) return null;
-  //   const phh2oLayer = soilData.properties.layers.find(
-  //     (layer) => layer.name === "phh2o"
-  //   );
-  //   if (!phh2oLayer) return null;
-  //   const phh2oValue = phh2oLayer.depths[0].values.mean; // Assuming only one depth value
-  //   return phh2oValue;
-  // };
-
-  // const phScaleGradient = () => {
-  //   // Define the pH scale range and corresponding colors
-  //   const pHScale = Array.from({ length: 15 }, (_, i) => i);
-  //   const colors = [
-  //     "rgba(255,0,0,0.5)", // Red for acidic
-  //     "rgba(255,255,0,0.5)", // Yellow for neutral
-  //     "rgba(0,255,0,0.5)", // Green for alkaline
-  //   ];
-
-  //   // Create datasets for the pH scale
-  //   const datasets = [
-  //     {
-  //       label: "pH Scale",
-  //       data: pHScale,
-  //       backgroundColor: colors,
-  //     },
-  //   ];
-
-  //   return {
-  //     labels: pHScale,
-  //     datasets: datasets,
-  //   };
-  // };
-
-  // const phh2oValue = getPhh2oValue();
 
   const linedata = () => {
     if (!soilData) return null;
@@ -169,22 +133,24 @@ const Soildata = ({ lon, lat }) => {
 
   const preparePHChartData = () => {
     if (!soilData) return null;
-  
+
     // Extract the phh2o layer
-    const phh2oLayer = soilData.properties.layers.find(layer => layer.name === 'phh2o');
+    const phh2oLayer = soilData.properties.layers.find(
+      (layer) => layer.name === "phh2o"
+    );
     if (!phh2oLayer) return null;
-  
+
     // Initialize depth ranges and pH data
-    const depthRanges = ['0-5', '5-15', '15-30', '30-60', '60-100', '100-200']; // Update with your desired depth ranges
-    const phData = depthRanges.map(_ => []);
-  
+    const depthRanges = ["0-5", "5-15", "15-30", "30-60", "60-100", "100-200"]; // Update with your desired depth ranges
+    const phData = depthRanges.map((_) => []);
+
     // Iterate through the depths in the phh2o layer and populate the pH data for each depth range
-    phh2oLayer.depths.forEach(depth => {
-      const depthLabel = depth.label.split('-');
+    phh2oLayer.depths.forEach((depth) => {
+      const depthLabel = depth.label.split("-");
       const depthStart = parseInt(depthLabel[0]);
-      const depthEnd = parseInt(depthLabel[1].replace('cm', ''));
-      const depthIndex = depthRanges.findIndex(range => {
-        const [start, end] = range.split('-').map(parseFloat);
+      const depthEnd = parseInt(depthLabel[1].replace("cm", ""));
+      const depthIndex = depthRanges.findIndex((range) => {
+        const [start, end] = range.split("-").map(parseFloat);
         return depthStart >= start && depthEnd <= end;
       });
       if (depthIndex !== -1) {
@@ -192,30 +158,30 @@ const Soildata = ({ lon, lat }) => {
         phData[depthIndex].push(scaledPH);
       }
     });
-  
+
     // Calculate average pH value for each depth range
-    const avgPHData = phData.map(data => {
+    const avgPHData = phData.map((data) => {
       const sum = data.reduce((acc, curr) => acc + curr, 0);
       return sum / data.length || 0; // Handle division by zero
     });
-  
+
     // Define bar chart data
     const barChartData = {
       labels: depthRanges,
-      datasets: [{
-        label: 'pH',
-        data: avgPHData,
-        backgroundColor: 'rgba(54, 162, 235, 0.5)', // Adjust color as needed
-        borderColor: 'rgba(54, 162, 235, 1)', // Adjust border color as needed
-        borderWidth: 1,
-      }],
+      datasets: [
+        {
+          label: "pH",
+          data: avgPHData,
+          backgroundColor: "rgba(54, 162, 235, 0.5)", // Adjust color as needed
+          borderColor: "rgba(54, 162, 235, 1)", // Adjust border color as needed
+          borderWidth: 1,
+        },
+      ],
     };
-  
+
     return barChartData;
   };
-  
 
-  
   return (
     <div>
       {soilData ? (
@@ -289,50 +255,50 @@ const Soildata = ({ lon, lat }) => {
           </div>
 
           <div className="flex justify-center items-center p-40 mx-10">
-  <Bar
-    data={preparePHChartData()}
-    options={{
-      responsive: true,
-      scales: {
-        x: {
-          title: {
-            display: true,
-            text: 'Depth Range (cm)',
-          },
-        },
-        y: {
-          title: {
-            display: true,
-            text: 'pH Value',
-          },
-          suggestedMin: 0, // Set minimum y-axis value
-          suggestedMax: 14, // Set maximum y-axis value
-        },
-      },
-    }}
-  />
-</div>
-
-
+            <Bar
+              data={preparePHChartData()}
+              options={{
+                responsive: true,
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: "Depth Range (cm)",
+                    },
+                  },
+                  y: {
+                    title: {
+                      display: true,
+                      text: "pH Value",
+                    },
+                    suggestedMin: 0, // Set minimum y-axis value
+                    suggestedMax: 14, // Set maximum y-axis value
+                  },
+                },
+              }}
+            />
+          </div>
         </div>
       ) : (
         <>
-        <div className=" relative flex justify-center">
-          <p className=" absolute top-52 font-semibold text-xl">Please Wait...Gathering soil data</p>
-        </div>
-        
-        <div className=" flex justify-center items-center align-middle w-screen h-screen">
-          <div className=" flex justify-center items-center ">
-            <div
-              id="loader"
-              className="w-20 h-20 relative rounded-lg animate-spin hover:bg-gray-700"
+          <div className=" relative flex justify-center">
+            <p className=" absolute top-52 font-semibold text-xl">
+              Please Wait...Gathering soil data
+            </p>
+          </div>
+
+          <div className=" flex justify-center items-center align-middle w-screen h-screen">
+            <div className=" flex justify-center items-center ">
+              <div
+                id="loader"
+                className="w-20 h-20 relative rounded-lg animate-spin hover:bg-gray-700"
               >
-              <div className="w-14 h-14 absolute rounded-lg bg-green-600 -top-5 -left-5"></div>
-              <div className="w-14 h-14 absolute rounded-lg bg-blue-600 -bottom-5 -right-5"></div>
+                <div className="w-14 h-14 absolute rounded-lg bg-green-600 -top-5 -left-5"></div>
+                <div className="w-14 h-14 absolute rounded-lg bg-blue-600 -bottom-5 -right-5"></div>
+              </div>
             </div>
           </div>
-        </div>
-              </>
+        </>
       )}
     </div>
   );
